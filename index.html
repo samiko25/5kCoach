@@ -378,6 +378,105 @@
             padding: 12px;
         }
 
+        .settings-section {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .settings-section h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .settings-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .settings-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .settings-item input,
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .settings-item input:focus,
+        .settings-item select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .settings-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:active {
+            opacity: 0.8;
+        }
+
+        .btn-danger {
+            flex: 1;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-danger:active {
+            opacity: 0.8;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
         @media (max-height: 600px) {
             .container {
                 margin-bottom: 12px;
@@ -413,6 +512,7 @@
             <button class="tab-btn active" onclick="switchTab(0)">Semaines</button>
             <button class="tab-btn" onclick="switchTab(1)">Allures</button>
             <button class="tab-btn" onclick="switchTab(2)">Conseils</button>
+            <button class="tab-btn" onclick="switchTab(3)">⚙️ Paramètres</button>
         </div>
 
         <!-- TAB 0: Semaines et entrainements -->
@@ -483,6 +583,75 @@
             </ul>
         </div>
 
+        <!-- TAB 3: Paramètres -->
+        <div class="tab-content" id="tab-3">
+            <div id="success-msg" class="success-message">✅ Paramètres sauvegardés!</div>
+
+            <div class="settings-section">
+                <h3>🎯 Objectif principal</h3>
+                <div class="settings-item">
+                    <label>Allure cible (min/km)</label>
+                    <input type="text" id="objectif-allure" placeholder="5.3" value="5.3">
+                </div>
+                <div class="settings-item">
+                    <label>Distance cible (km)</label>
+                    <input type="number" id="objectif-distance" placeholder="5" value="5" min="1" step="0.1">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>📊 Programme</h3>
+                <div class="settings-item">
+                    <label>Nombre de semaines</label>
+                    <input type="number" id="nb-semaines" placeholder="8" value="8" min="4" max="16">
+                </div>
+                <div class="settings-item">
+                    <label>Nombre d'entraînements par semaine</label>
+                    <select id="nb-entrainements">
+                        <option value="2">2 par semaine</option>
+                        <option value="3" selected>3 par semaine</option>
+                        <option value="4">4 par semaine</option>
+                        <option value="5">5 par semaine</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>⏱️ Allures personnalisées</h3>
+                <div class="settings-item">
+                    <label>Allure facile (min/km)</label>
+                    <input type="text" id="allure-facile" placeholder="7'30" value="7'30">
+                </div>
+                <div class="settings-item">
+                    <label>Allure tempo (min/km)</label>
+                    <input type="text" id="allure-tempo" placeholder="6'12" value="6'12">
+                </div>
+                <div class="settings-item">
+                    <label>Allure VO₂max (min/km)</label>
+                    <input type="text" id="allure-vo2" placeholder="5'30" value="5'30">
+                </div>
+                <div class="settings-item">
+                    <label>Allure sprint (min/km)</label>
+                    <input type="text" id="allure-sprint" placeholder="5'00" value="5'00">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>⚠️ Actions</h3>
+                <div class="settings-buttons">
+                    <button class="btn-primary" onclick="saveSettings()">💾 Sauvegarder</button>
+                    <button class="btn-danger" onclick="resetAllData()">🗑️ Réinitialiser</button>
+                </div>
+            </div>
+
+            <div style="background: #f0f4ff; padding: 12px; border-radius: 8px; font-size: 12px; color: #555; line-height: 1.6;">
+                <strong>ℹ️ Info :</strong><br>
+                • Vos modifications se sauvegardent automatiquement<br>
+                • "Réinitialiser" efface TOUS vos entraînements complétés<br>
+                • Les données sont stockées localement sur votre téléphone
+            </div>
+        </div>
+
         <div class="footer">
             Sauvegarde automatique • Bon courage! 🔥
         </div>
@@ -538,7 +707,10 @@
             const selector = document.getElementById('semaine-selector');
             selector.innerHTML = '';
             
-            for (let i = 1; i <= 8; i++) {
+            const settings = localStorage.getItem('settings');
+            const nbSemaines = settings ? JSON.parse(settings).nbSemaines : 8;
+            
+            for (let i = 1; i <= parseInt(nbSemaines); i++) {
                 const btn = document.createElement('button');
                 btn.className = `semaine-btn ${deloadWeeks.includes(i) ? 'deload' : ''} ${i === 1 ? 'active' : ''}`;
                 btn.textContent = `S${i}`;
@@ -560,13 +732,21 @@
 
         function renderEntrainements(week) {
             const container = document.getElementById('entrainements-container');
-            const entraits = data[week];
+            
+            const settings = localStorage.getItem('settings');
+            const nbEntrainements = settings ? parseInt(JSON.parse(settings).nbEntrainements) : 3;
             
             container.innerHTML = '';
             
-            entraits.forEach((train, idx) => {
+            for (let idx = 0; idx < nbEntrainements; idx++) {
                 const key = `w${week}e${idx}`;
                 const saved = getSaved(key);
+                
+                // Créer un entraînement générique si on dépasse les données prédéfinies
+                let train = data[week] && data[week][idx] ? data[week][idx] : { 
+                    nom: `L${idx + 1}`, 
+                    desc: 'Entraînement à définir' 
+                };
                 
                 const div = document.createElement('div');
                 div.className = `entrainement ${saved ? 'completed' : ''}`;
@@ -598,7 +778,7 @@
                 `;
                 
                 container.appendChild(div);
-            });
+            }
         }
 
         function toggleTrain(key) {
@@ -673,7 +853,72 @@
             document.querySelectorAll('.tab-btn')[idx].classList.add('active');
         }
 
+        // Settings
+        function loadSettings() {
+            const saved = localStorage.getItem('settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                document.getElementById('objectif-allure').value = settings.objectifAllure || '5.3';
+                document.getElementById('objectif-distance').value = settings.objectifDistance || '5';
+                document.getElementById('nb-semaines').value = settings.nbSemaines || '8';
+                document.getElementById('nb-entrainements').value = settings.nbEntrainements || '3';
+                document.getElementById('allure-facile').value = settings.allureFacile || '7\'30';
+                document.getElementById('allure-tempo').value = settings.allureTempo || '6\'12';
+                document.getElementById('allure-vo2').value = settings.allureVO2 || '5\'30';
+                document.getElementById('allure-sprint').value = settings.allureSprint || '5\'00';
+
+                updateObjectifDisplay();
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                objectifAllure: document.getElementById('objectif-allure').value,
+                objectifDistance: document.getElementById('objectif-distance').value,
+                nbSemaines: document.getElementById('nb-semaines').value,
+                nbEntrainements: document.getElementById('nb-entrainements').value,
+                allureFacile: document.getElementById('allure-facile').value,
+                allureTempo: document.getElementById('allure-tempo').value,
+                allureVO2: document.getElementById('allure-vo2').value,
+                allureSprint: document.getElementById('allure-sprint').value
+            };
+
+            localStorage.setItem('settings', JSON.stringify(settings));
+            
+            // Afficher message de succès
+            const msg = document.getElementById('success-msg');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 3000);
+
+            updateObjectifDisplay();
+            loadTrainings(); // Recharger les semaines
+        }
+
+        function updateObjectifDisplay() {
+            const allure = document.getElementById('objectif-allure').value;
+            const distance = document.getElementById('objectif-distance').value;
+            const nbSemaines = document.getElementById('nb-semaines').value;
+            document.querySelector('.objectif-box .grande').textContent = `${allure}/km`;
+            document.querySelector('.objectif-box p').textContent = `~${(parseFloat(allure.replace(/'/g, '.')) * parseFloat(distance)).toFixed(0)} minutes`;
+            document.querySelector('.header p').textContent = `Suivi ${nbSemaines} semaines • Objectif ${distance}km`;
+        }
+
+        function resetAllData() {
+            if (confirm('⚠️ Êtes-vous sûr? Tous vos entraînements seront supprimés!')) {
+                // Effacer tous les entraînements
+                for (let w = 1; w <= 8; w++) {
+                    for (let e = 0; e < 3; e++) {
+                        localStorage.removeItem(`train-w${w}e${e}`);
+                    }
+                }
+                
+                // Recharger
+                window.location.reload();
+            }
+        }
+
         // Init
+        loadSettings();
         loadTrainings();
         updateStats();
     </script>
