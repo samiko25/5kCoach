@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="5K Coach">
-    <title>5K Coach - 28 min</title>
+    <title>5K Coach</title>
     <style>
         * {
             margin: 0;
@@ -95,6 +95,21 @@
             color: white;
         }
 
+        .phase-info {
+            background: #f0f4ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            border-left: 3px solid #667eea;
+            color: #555;
+        }
+
+        .phase-info.deload {
+            background: #fff5f5;
+            border-left-color: #ff6b6b;
+        }
+
         .entrainement {
             background: #f9f9f9;
             border-left: 4px solid #667eea;
@@ -173,7 +188,6 @@
             color: #667eea;
             margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .input-field input {
@@ -181,7 +195,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 13px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .input-field input:focus {
@@ -204,7 +217,6 @@
             opacity: 0.9;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .objectif-box .grande {
@@ -227,11 +239,6 @@
             border-left: 3px solid #667eea;
         }
 
-        .stat-card.completed {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
-        }
-
         .stat-label {
             font-size: 11px;
             color: #666;
@@ -244,10 +251,6 @@
             font-size: 20px;
             font-weight: 700;
             color: #667eea;
-        }
-
-        .stat-card.completed .stat-value {
-            color: #4caf50;
         }
 
         .tabs {
@@ -267,13 +270,11 @@
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
             margin-bottom: -2px;
         }
 
         .tab-btn.active {
-            background: transparent;
             color: #667eea;
             border-bottom-color: #667eea;
         }
@@ -311,7 +312,6 @@
             font-size: 16px;
             font-weight: 700;
             color: #667eea;
-            font-family: 'Courier New', monospace;
         }
 
         .tips-list {
@@ -344,7 +344,6 @@
             font-size: 14px;
             margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             font-weight: 700;
         }
 
@@ -371,7 +370,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 13px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .settings-item input:focus,
@@ -412,10 +410,6 @@
             cursor: pointer;
         }
 
-        .btn-danger:active {
-            opacity: 0.8;
-        }
-
         .success-message {
             background: #e8f5e9;
             border-left: 3px solid #4caf50;
@@ -431,43 +425,11 @@
             display: block;
         }
 
-        .stats-semaine {
-            background: #f0f4ff;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            border: 2px solid #667eea;
-        }
-
-        .stats-semaine h3 {
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 12px;
-        }
-
-        .stat-item:last-child {
-            border-bottom: none;
-        }
-
         .footer {
             text-align: center;
             font-size: 11px;
             color: #999;
             padding: 12px;
-        }
-
-        @media (max-height: 600px) {
-            .container {
-                margin-bottom: 12px;
-            }
         }
     </style>
 </head>
@@ -475,7 +437,7 @@
     <div class="container">
         <div class="header">
             <h1>🏃 5K COACH</h1>
-            <p id="header-subtitle">Suivi 8 semaines • Objectif 5k</p>
+            <p id="header-subtitle">Programme adaptatif</p>
         </div>
 
         <div class="objectif-box">
@@ -485,12 +447,12 @@
         </div>
 
         <div class="stats">
-            <div class="stat-card" id="stat-completed">
+            <div class="stat-card">
                 <div class="stat-label">Entraînements</div>
-                <div class="stat-value">0/24</div>
+                <div class="stat-value" id="stat-count">0/24</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Semaine actuelle</div>
+                <div class="stat-label">Semaine</div>
                 <div class="stat-value" id="current-week">1</div>
             </div>
         </div>
@@ -502,49 +464,32 @@
             <button class="tab-btn" onclick="switchTab(3)">⚙️ Paramètres</button>
         </div>
 
-        <!-- TAB 0: Semaines et entrainements -->
+        <!-- TAB 0: Semaines -->
         <div class="tab-content active" id="tab-0">
             <div class="semaine-selector" id="semaine-selector"></div>
+            <div id="phase-info"></div>
             <div id="entrainements-container"></div>
         </div>
 
         <!-- TAB 1: Allures -->
         <div class="tab-content" id="tab-1">
-            <div style="margin-bottom: 16px;">
-                <h3 style="color: #667eea; font-size: 14px; margin-bottom: 12px;">📊 Vos allures de travail</h3>
-                <div class="allures-grid" id="allures-display">
-                    <div class="allure-card">
-                        <div class="allure-label">Facile</div>
-                        <div class="allure-value" id="display-facile">7'30</div>
-                    </div>
-                    <div class="allure-card">
-                        <div class="allure-label">Tempo</div>
-                        <div class="allure-value" id="display-tempo">6'12</div>
-                    </div>
-                    <div class="allure-card">
-                        <div class="allure-label">VO₂max</div>
-                        <div class="allure-value" id="display-vo2">5'30</div>
-                    </div>
-                    <div class="allure-card">
-                        <div class="allure-label">Sprint</div>
-                        <div class="allure-value" id="display-sprint">5'00</div>
-                    </div>
+            <h3 style="color: #667eea; font-size: 14px; margin-bottom: 12px;">📊 Vos allures</h3>
+            <div class="allures-grid">
+                <div class="allure-card">
+                    <div class="allure-label">Facile</div>
+                    <div class="allure-value" id="display-facile">7'30</div>
                 </div>
-            </div>
-
-            <div class="stats-semaine">
-                <h3>📈 Progression par allure</h3>
-                <div class="stat-item">
-                    <span>Allures faciles</span>
-                    <span id="count-facile">0</span>
+                <div class="allure-card">
+                    <div class="allure-label">Tempo</div>
+                    <div class="allure-value" id="display-tempo">6'12</div>
                 </div>
-                <div class="stat-item">
-                    <span>Séances tempo</span>
-                    <span id="count-tempo">0</span>
+                <div class="allure-card">
+                    <div class="allure-label">VO₂max</div>
+                    <div class="allure-value" id="display-vo2">5'30</div>
                 </div>
-                <div class="stat-item">
-                    <span>Séances VO₂max</span>
-                    <span id="count-vo2">0</span>
+                <div class="allure-card">
+                    <div class="allure-label">Sprint</div>
+                    <div class="allure-value" id="display-sprint">5'00</div>
                 </div>
             </div>
         </div>
@@ -552,31 +497,29 @@
         <!-- TAB 2: Conseils -->
         <div class="tab-content" id="tab-2">
             <ul class="tips-list">
-                <li><strong>⚠️ Repos obligatoire</strong> : minimum 1 jour entre 2 séances</li>
-                <li><strong>🏃 Échauffement</strong> : 5-10 min de marche avant</li>
-                <li><strong>💨 Effort VO₂max</strong> : vous devez être essoufflé</li>
-                <li><strong>🎯 Tempo</strong> : allure soutenue mais pas au maximum</li>
-                <li><strong>😌 Facile</strong> : vous pouvez parler en courant</li>
-                <li><strong>🧘 Étirements</strong> : 5-10 min après, cuisses/mollets</li>
-                <li><strong>💧 Hydratation</strong> : crucial pour progresser</li>
-                <li><strong>🚨 Douleur?</strong> : repos immédiat, ne force pas!</li>
-                <li><strong>📱 Notez vos allures</strong> : suivre la progression</li>
-                <li><strong>💪 Discipline = Résultats</strong> : soyez régulier!</li>
+                <li><strong>⚠️ Repos obligatoire</strong> : 1 jour minimum entre séances</li>
+                <li><strong>🏃 Échauffement</strong> : 5-10 min de marche</li>
+                <li><strong>💨 VO₂max</strong> : vous devez être essoufflé</li>
+                <li><strong>🎯 Tempo</strong> : soutenu mais pas max</li>
+                <li><strong>😌 Facile</strong> : vous pouvez parler</li>
+                <li><strong>🧘 Étirements</strong> : 5-10 min après</li>
+                <li><strong>💧 Hydratation</strong> : crucial</li>
+                <li><strong>🚨 Douleur?</strong> : repos immédiat!</li>
             </ul>
         </div>
 
         <!-- TAB 3: Paramètres -->
         <div class="tab-content" id="tab-3">
-            <div id="success-msg" class="success-message">✅ Entraînements recalculés!</div>
+            <div id="success-msg" class="success-message">✅ Programme recalculé!</div>
 
             <div class="settings-section">
-                <h3>🎯 Objectif principal</h3>
+                <h3>🎯 Objectif</h3>
                 <div class="settings-item">
                     <label>Allure cible (min/km)</label>
                     <input type="text" id="objectif-allure-input" placeholder="5.3" value="5.3">
                 </div>
                 <div class="settings-item">
-                    <label>Distance cible (km)</label>
+                    <label>Distance (km)</label>
                     <input type="number" id="objectif-distance" placeholder="5" value="5" min="1" step="0.1">
                 </div>
             </div>
@@ -588,7 +531,7 @@
                     <input type="number" id="nb-semaines" placeholder="8" value="8" min="4" max="16">
                 </div>
                 <div class="settings-item">
-                    <label>Nombre d'entraînements par semaine</label>
+                    <label>Entraînements/semaine</label>
                     <select id="nb-entrainements">
                         <option value="2">2 par semaine</option>
                         <option value="3" selected>3 par semaine</option>
@@ -599,83 +542,125 @@
             </div>
 
             <div class="settings-section">
-                <h3>⏱️ Allures personnalisées</h3>
+                <h3>⏱️ Allures</h3>
                 <div class="settings-item">
-                    <label>Allure facile (min/km)</label>
+                    <label>Facile</label>
                     <input type="text" id="allure-facile" placeholder="7'30" value="7'30">
                 </div>
                 <div class="settings-item">
-                    <label>Allure tempo (min/km)</label>
+                    <label>Tempo</label>
                     <input type="text" id="allure-tempo" placeholder="6'12" value="6'12">
                 </div>
                 <div class="settings-item">
-                    <label>Allure VO₂max (min/km)</label>
+                    <label>VO₂max</label>
                     <input type="text" id="allure-vo2" placeholder="5'30" value="5'30">
                 </div>
                 <div class="settings-item">
-                    <label>Allure sprint (min/km)</label>
+                    <label>Sprint</label>
                     <input type="text" id="allure-sprint" placeholder="5'00" value="5'00">
                 </div>
             </div>
 
-            <div class="settings-section">
-                <h3>⚠️ Actions</h3>
-                <div class="settings-buttons">
-                    <button class="btn-primary" onclick="saveSettings()">💾 Sauvegarder</button>
-                    <button class="btn-danger" onclick="resetAllData()">🗑️ Réinitialiser</button>
-                </div>
-            </div>
-
-            <div style="background: #f0f4ff; padding: 12px; border-radius: 8px; font-size: 12px; color: #555; line-height: 1.6;">
-                <strong>ℹ️ Info :</strong><br>
-                • Les entraînements se recalculent automatiquement<br>
-                • "Réinitialiser" efface TOUS vos entraînements complétés<br>
-                • Les données sont stockées localement sur votre téléphone
+            <div class="settings-buttons">
+                <button class="btn-primary" onclick="saveSettings()">💾 Sauvegarder</button>
+                <button class="btn-danger" onclick="resetAllData()">🗑️ Réinit</button>
             </div>
         </div>
 
-        <div class="footer">
-            Sauvegarde automatique • Bon courage! 🔥
-        </div>
+        <div class="footer">Sauvegarde automatique • Bon courage! 🔥</div>
     </div>
 
     <script>
-        // Générateur d'entraînements dynamique
-        function generateTrainings() {
+        // Programme intelligent adaptatif
+        function generateAdaptiveProgram() {
             const settings = getSettings();
             const nbSemaines = parseInt(settings.nbSemaines);
             const nbEntrainements = parseInt(settings.nbEntrainements);
-            const trainings = {};
+            const program = {};
 
-            const typesByCount = {
-                2: ['VO₂max', 'Facile'],
-                3: ['VO₂max', 'Facile', 'Tempo'],
-                4: ['VO₂max', 'Facile', 'Tempo', 'Facile'],
-                5: ['VO₂max', 'Facile', 'Tempo', 'Facile', 'Repos']
-            };
+            // Phases du programme
+            const phases = [];
+            const remiseEnRouteWeeks = Math.ceil(nbSemaines * 0.2); // 20% = remise en route
+            const intensiteWeeks = Math.ceil(nbSemaines * 0.5); // 50% = intensité
+            const specificiteWeeks = nbSemaines - remiseEnRouteWeeks - intensiteWeeks;
 
-            const typesPerWeek = typesByCount[nbEntrainements];
-
-            const descriptions = {
-                'VO₂max': () => `10' facile + 4×(4' VO₂max ${settings.allureVO2} / 2' lent) + 5' facile`,
-                'Tempo': () => `10' facile + 2×(6' tempo ${settings.allureTempo} / 2' lent) + 5' facile`,
-                'Facile': () => `30-40' facile ${settings.allureFacile} continu`,
-                'Repos': () => `Repos complet ou étirements légers`
-            };
-
+            // Génération par phase
             for (let week = 1; week <= nbSemaines; week++) {
-                trainings[week] = [];
-                for (let i = 0; i < nbEntrainements; i++) {
-                    const type = typesPerWeek[i];
-                    trainings[week].push({
-                        nom: `L${i + 1} - ${type}`,
-                        desc: descriptions[type](),
-                        type: type
-                    });
+                let phase, intensity;
+                
+                if (week <= remiseEnRouteWeeks) {
+                    phase = 'Remise en route';
+                    intensity = 0.5 + (week / remiseEnRouteWeeks) * 0.2; // 0.5 à 0.7
+                } else if (week <= remiseEnRouteWeeks + intensiteWeeks) {
+                    phase = 'Intensité';
+                    const intensityProgress = (week - remiseEnRouteWeeks) / intensiteWeeks;
+                    intensity = 0.7 + intensityProgress * 0.25; // 0.7 à 0.95
+                } else {
+                    phase = 'Spécificité';
+                    intensity = 0.95;
                 }
+
+                // Déload toutes les 3 semaines environ
+                const isDeload = (week % 3 === 0) && week !== nbSemaines;
+                if (isDeload) intensity *= 0.7;
+
+                program[week] = {
+                    phase: phase,
+                    intensity: intensity,
+                    isDeload: isDeload,
+                    trainings: generateWeekTrainings(week, nbEntrainements, intensity, settings)
+                };
+            }
+
+            return program;
+        }
+
+        function generateWeekTrainings(week, nbEntrainements, intensity, settings) {
+            const trainings = [];
+            const types = getTrainingTypes(nbEntrainements);
+
+            for (let i = 0; i < nbEntrainements; i++) {
+                const type = types[i];
+                trainings.push({
+                    nom: `L${i + 1} - ${type}`,
+                    type: type,
+                    desc: generateTrainingDesc(type, intensity, settings)
+                });
             }
 
             return trainings;
+        }
+
+        function getTrainingTypes(nbEntrainements) {
+            const mapping = {
+                2: ['VO₂max', 'Facile'],
+                3: ['VO₂max', 'Facile', 'Tempo'],
+                4: ['VO₂max', 'Facile', 'Tempo', 'Récup'],
+                5: ['VO₂max', 'Facile', 'Tempo', 'Récup', 'Sprint']
+            };
+            return mapping[nbEntrainements] || mapping[3];
+        }
+
+        function generateTrainingDesc(type, intensity, settings) {
+            const descriptions = {
+                'VO₂max': () => {
+                    const reps = Math.max(3, Math.floor(5 * intensity));
+                    const duration = Math.max(3, Math.floor(6 * intensity));
+                    return `10' facile + ${reps}×(${duration}' VO₂ ${settings.allureVO2} / 2' lent) + 5' facile`;
+                },
+                'Tempo': () => {
+                    const duration = Math.max(8, Math.floor(12 * intensity));
+                    return `10' facile + 1×(${duration}' tempo ${settings.allureTempo}) + 5' facile`;
+                },
+                'Facile': () => {
+                    const duration = Math.max(25, Math.floor(45 * intensity));
+                    return `${duration}' facile ${settings.allureFacile} continu`;
+                },
+                'Récup': () => `20-25' très facile ${settings.allureFacile}`,
+                'Sprint': () => `10' facile + 6×(90" sprint ${settings.allureSprint} / 90" lent) + 5' facile`
+            };
+
+            return (descriptions[type] || descriptions['Facile'])();
         }
 
         function getSettings() {
@@ -685,64 +670,68 @@
                 objectifDistance: '5',
                 nbSemaines: '8',
                 nbEntrainements: '3',
-                allureFacile: '7\'30',
-                allureTempo: '6\'12',
-                allureVO2: '5\'30',
-                allureSprint: '5\'00'
+                allureFacile: "7'30",
+                allureTempo: "6'12",
+                allureVO2: "5'30",
+                allureSprint: "5'00"
             };
             return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
         }
 
-        function loadTrainings() {
+        function loadSemaines() {
             const settings = getSettings();
-            const selector = document.getElementById('semaine-selector');
             const nbSemaines = parseInt(settings.nbSemaines);
-            
+            const selector = document.getElementById('semaine-selector');
             selector.innerHTML = '';
-            
+
             for (let i = 1; i <= nbSemaines; i++) {
+                const program = generateAdaptiveProgram();
                 const btn = document.createElement('button');
-                const isDeload = i === Math.ceil(nbSemaines / 2) || i === nbSemaines;
+                const isDeload = program[i].isDeload;
                 btn.className = `semaine-btn ${isDeload ? 'deload' : ''} ${i === 1 ? 'active' : ''}`;
                 btn.textContent = `S${i}`;
                 btn.onclick = () => selectWeek(i);
                 selector.appendChild(btn);
             }
-            
+
             selectWeek(1);
         }
 
         function selectWeek(week) {
-            document.querySelectorAll('.semaine-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.semaine-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.semaine-btn')[week - 1].classList.add('active');
             
-            renderEntrainements(week);
+            const program = generateAdaptiveProgram();
+            renderWeek(week, program[week]);
             updateStats();
             document.getElementById('current-week').textContent = week;
         }
 
-        function renderEntrainements(week) {
-            const settings = getSettings();
-            const trainings = generateTrainings();
+        function renderWeek(week, weekData) {
             const container = document.getElementById('entrainements-container');
+            const phaseInfo = document.getElementById('phase-info');
             
+            // Phase info
+            const intensity = Math.round(weekData.intensity * 100);
+            const phaseText = weekData.isDeload ? '⚡ Semaine de déload - légère' : `📈 ${weekData.phase} (intensité ${intensity}%)`;
+            phaseInfo.innerHTML = `${phaseText}`;
+            phaseInfo.className = `phase-info ${weekData.isDeload ? 'deload' : ''}`;
+
+            // Trainings
             container.innerHTML = '';
-            
-            if (!trainings[week]) return;
-            
-            trainings[week].forEach((train, idx) => {
+            weekData.trainings.forEach((train, idx) => {
                 const key = `w${week}e${idx}`;
                 const saved = getSaved(key);
-                
+
                 const div = document.createElement('div');
                 div.className = `entrainement ${saved ? 'completed' : ''}`;
                 div.id = `train-${key}`;
-                
+
                 div.innerHTML = `
                     <div class="entrainement-header">
                         <div>
                             <div class="entrainement-titre">${train.nom}</div>
-                            <div style="font-size: 11px; color: #999; margin-top: 2px;">Semaine ${week}</div>
+                            <div style="font-size: 11px; color: #999;">Semaine ${week}</div>
                         </div>
                         <div class="checkbox ${saved ? 'checked' : ''}" onclick="toggleTrain('${key}')">
                             ${saved ? '✓' : ''}
@@ -754,15 +743,15 @@
                     <div class="input-group">
                         <div class="input-field" style="flex: 2;">
                             <label class="input-label">Allure réelle</label>
-                            <input type="text" placeholder="ex: 6'30/km" class="input-allure" id="allure-${key}" value="${saved?.allure || ''}" onchange="saveAllure('${key}')">
+                            <input type="text" placeholder="ex: 6'30/km" id="allure-${key}" value="${saved?.allure || ''}" onchange="saveAllure('${key}')">
                         </div>
                         <div class="input-field">
-                            <label class="input-label">Km/Distance</label>
-                            <input type="text" placeholder="ex: 5" class="input-km" id="km-${key}" value="${saved?.km || ''}" onchange="saveAllure('${key}')">
+                            <label class="input-label">Km</label>
+                            <input type="text" placeholder="ex: 5" id="km-${key}" value="${saved?.km || ''}" onchange="saveAllure('${key}')">
                         </div>
                     </div>
                 `;
-                
+
                 container.appendChild(div);
             });
         }
@@ -771,14 +760,14 @@
             const saved = getSaved(key);
             const checkbox = document.querySelector(`#train-${key} .checkbox`);
             const train = document.getElementById(`train-${key}`);
-            
+
             if (saved) {
                 localStorage.removeItem(`train-${key}`);
                 checkbox.classList.remove('checked');
                 checkbox.textContent = '';
                 train.classList.remove('completed');
             } else {
-                saveTrain(key, true);
+                localStorage.setItem(`train-${key}`, JSON.stringify({ done: true }));
                 checkbox.classList.add('checked');
                 checkbox.textContent = '✓';
                 train.classList.add('completed');
@@ -789,15 +778,12 @@
         function saveAllure(key) {
             const allure = document.getElementById(`allure-${key}`).value;
             const km = document.getElementById(`km-${key}`).value;
-            const data = { done: true, allure, km };
+            const data = JSON.parse(localStorage.getItem(`train-${key}`) || '{}');
+            data.allure = allure;
+            data.km = km;
+            data.done = true;
             localStorage.setItem(`train-${key}`, JSON.stringify(data));
             updateStats();
-        }
-
-        function saveTrain(key, done) {
-            const saved = getSaved(key) || {};
-            saved.done = done;
-            localStorage.setItem(`train-${key}`, JSON.stringify(saved));
         }
 
         function getSaved(key) {
@@ -807,10 +793,9 @@
 
         function updateStats() {
             const settings = getSettings();
-            const trainings = generateTrainings();
             const nbSemaines = parseInt(settings.nbSemaines);
             const nbEntrainements = parseInt(settings.nbEntrainements);
-            const totalTrainings = nbSemaines * nbEntrainements;
+            const total = nbSemaines * nbEntrainements;
 
             let completed = 0;
             for (let w = 1; w <= nbSemaines; w++) {
@@ -818,11 +803,11 @@
                     if (getSaved(`w${w}e${e}`)) completed++;
                 }
             }
-            
-            document.querySelector('#stat-completed .stat-value').textContent = `${completed}/${totalTrainings}`;
+
+            document.getElementById('stat-count').textContent = `${completed}/${total}`;
         }
 
-        function updateAllureDisplay() {
+        function updateDisplay() {
             const settings = getSettings();
             document.getElementById('display-facile').textContent = settings.allureFacile;
             document.getElementById('display-tempo').textContent = settings.allureTempo;
@@ -834,7 +819,7 @@
             const allure = parseFloat(settings.objectifAllure.replace(/'/g, '.'));
             const temps = Math.round(allure * distance);
             document.getElementById('objectif-temps').textContent = `~${temps} minutes`;
-            document.getElementById('header-subtitle').textContent = `Suivi ${settings.nbSemaines} semaines • Objectif ${settings.objectifDistance}km`;
+            document.getElementById('header-subtitle').textContent = `${settings.nbSemaines} semaines • ${settings.objectifDistance}km`;
         }
 
         function loadSettings() {
@@ -848,7 +833,7 @@
             document.getElementById('allure-vo2').value = settings.allureVO2;
             document.getElementById('allure-sprint').value = settings.allureSprint;
             
-            updateAllureDisplay();
+            updateDisplay();
         }
 
         function saveSettings() {
@@ -867,15 +852,15 @@
             
             const msg = document.getElementById('success-msg');
             msg.classList.add('show');
-            setTimeout(() => msg.classList.remove('show'), 3000);
+            setTimeout(() => msg.classList.remove('show'), 2000);
 
-            updateAllureDisplay();
-            loadTrainings();
+            updateDisplay();
+            loadSemaines();
             updateStats();
         }
 
         function resetAllData() {
-            if (confirm('⚠️ Êtes-vous sûr? Tous vos entraînements seront supprimés!')) {
+            if (confirm('⚠️ Tous vos entraînements seront supprimés!')) {
                 const settings = getSettings();
                 const nbSemaines = parseInt(settings.nbSemaines);
                 const nbEntrainements = parseInt(settings.nbEntrainements);
@@ -885,7 +870,6 @@
                         localStorage.removeItem(`train-w${w}e${e}`);
                     }
                 }
-                
                 window.location.reload();
             }
         }
@@ -899,7 +883,7 @@
 
         // Init
         loadSettings();
-        loadTrainings();
+        loadSemaines();
         updateStats();
     </script>
 </body>
